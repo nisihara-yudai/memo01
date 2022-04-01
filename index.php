@@ -8,9 +8,8 @@ function dbConnect()
   $password = 'root'; //パスワード
 
   try {
-    new PDO($dsn, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,]);
-
-    var_dump("疎通確認OK!");
+    return new PDO($dsn, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,]);
+    // var_dump("疎通確認OK!");
   } catch (PDOException $e) {
     header('Content-Type: text/plain; charset=utf8', true, 500);
     var_dump($e->getMessage());
@@ -18,7 +17,7 @@ function dbConnect()
   }
 }
 
-function fetchAll()
+function fetchALL()
 {
   $sql = "SELECT * FROM todo";
   $query = dbConnect()->query($sql);
@@ -28,14 +27,16 @@ function fetchAll()
 function create($text)
 {
   $now = date('Y-m-d H:i:s');
-  $sql = 'insert into todo(text,created_at,updated_at) values(?,?,?,?)';
+  $sql = 'insert into todo(text,created_at,updated_at) values(?,?,?)';
   $stmt = dbConnect()->prepare($sql);
-  $stmt = execute([$text, $now, $now]);
+  $stmt->execute([$text, $now, $now]);
 }
 
 function update($id, $text)
 {
-  $sql = 'UPDATE todo SET text = ?,updated_at = ? where todo.id = ?';
+  $sql = 'UPDATE todo SET text = ?,updated_at = ? WHERE todo.id = ?';
+  $stmt = dbConnect()->prepare($sql);
+  $stmt->execute([$text, date('Y-m-d H:i:s'), $id]);
 }
 
 function delete($id)
